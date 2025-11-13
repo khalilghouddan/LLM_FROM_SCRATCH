@@ -1,0 +1,276 @@
+
+------------------OpenFile---------------------------------
+
+
+with open("the-verdict.txt", "r", encoding="utf-8") as f:
+    raw_text = f.read()
+with open(...) as f:
+
+open("the-verdict.txt", "r", encoding="utf-8") : ouvre le fichier the-verdict.txt en mode lecture ("r").
+
+encoding="utf-8" : s’assure que le fichier est lu avec l’encodage UTF-8, ce qui est important si le texte contient des caractères spéciaux (accent, symboles, etc.).
+
+Le mot-clé with est utilisé pour gérer automatiquement la fermeture du fichier après lecture. On n’a donc pas besoin de faire f.close().
+
+f devient l’objet fichier que l’on peut utiliser pour lire son contenu.
+
+raw_text = f.read()
+
+Cette ligne lit tout le contenu du fichier et le stocke dans la variable raw_text sous forme de chaîne de caractères (str).
+
+Après cette opération, raw_text contient le texte complet du fichier.
+
+python
+Copy code
+print("Total number of character:", len(raw_text))
+len(raw_text) : calcule le nombre total de caractères dans le texte (y compris espaces, retours à la ligne, ponctuation, etc.).
+
+Cela permet d’avoir une idée de la taille du fichier en caractères.
+
+python
+Copy code
+print(raw_text[:99])
+raw_text[:99] : extrait les 99 premiers caractères du texte.
+
+Cela sert à afficher un aperçu du début du fichier, pratique pour vérifier rapidement son contenu.
+
+
+
+------------------DeviserPHrase---------------------------------
+
+import re
+On importe le module re, qui permet de travailler avec des expressions régulières en Python.
+
+python
+Copy code
+text = "Hello, world. This, is a test."
+On définit une chaîne de caractères text que l’on va analyser.
+
+python
+Copy code
+result = re.split(r'(\s)', text)
+re.split() : fonction qui divise une chaîne en utilisant un modèle d’expression régulière (regex) comme séparateur.
+
+r'(\s)' : c’est le modèle utilisé ici.
+
+\s signifie espace blanc (espace, tabulation, retour à la ligne…).
+
+Les parenthèses () autour de \s signifient que le séparateur sera capturé et conservé dans le résultat.
+
+Donc ici, on divise le texte à chaque espace, mais on garde aussi les espaces dans la liste finale.
+
+python
+Copy code
+print(result)
+Affiche le résultat :
+
+Le résultat sera quelque chose comme :
+
+python
+Copy code
+['Hello,', ' ', 'world.', ' ', 'This,', ' ', 'is', ' ', 'a', ' ', 'test.']
+Remarques :
+
+Chaque mot est séparé et les espaces sont inclus comme éléments séparés.
+
+Si tu enlèves les parenthèses dans r'\s', les espaces ne seraient pas inclus dans la liste :
+
+python
+Copy code
+re.split(r'\s', text)
+# ['Hello,', 'world.', 'This,', 'is', 'a', 'test.']
+
+
+
+
+result = re.split(r'([,.]|\s)', text)
+Explication étape par étape :
+re.split()
+
+Comme avant, cette fonction divise une chaîne selon un motif (regex).
+
+r'([,.]|\s)'
+
+Ici, le motif indique plusieurs séparateurs possibles :
+
+[,.] → correspond à la virgule , ou le point .
+
+\s → correspond à n’importe quel espace blanc (espace, tab, retour à la ligne…)
+
+Le | signifie "ou", donc on divise à chaque virgule, point ou espace.
+
+Les parenthèses () signifient que le séparateur lui-même sera inclus dans le résultat.
+
+print(result)
+
+Affiche la liste résultante après découpage.
+
+------------------deleteThe Spaces---------------------------------
+
+result = [item for item in result if item.strip()]
+Étape par étape :
+List comprehension
+
+[item for item in result ...] → crée une nouvelle liste en parcourant chaque élément de result.
+
+Condition if item.strip()
+
+item.strip() supprime les espaces en début et fin de la chaîne.
+
+Si après strip() la chaîne est vide, Python la considère comme False.
+
+Donc if item.strip() ne garde que les éléments non vides (mots ou ponctuation).
+
+
+
+------------------CreatingVocabulary ---------------------------------
+
+all_words = sorted(set(preprocessed))
+vocab_size = len(all_words)
+
+print(vocab_size)
+Étape par étape :
+set(preprocessed)
+
+preprocessed est supposé être une liste de mots (après nettoyage, tokenisation, etc.).
+
+set() transforme la liste en ensemble, ce qui supprime automatiquement les doublons.
+
+Exemple : ['hello', 'world', 'hello'] → {'hello', 'world'}
+
+sorted(set(preprocessed))
+
+sorted() trie les éléments de l’ensemble par ordre alphabétique.
+
+On obtient donc une liste de mots uniques triés.
+
+vocab_size = len(all_words)
+
+len() calcule le nombre total de mots uniques dans la liste.
+
+C’est ce qu’on appelle la taille du vocabulaire (vocab_size) dans le traitement de texte ou NLP.
+
+print(vocab_size)
+
+Affiche la taille du vocabulaire, c’est-à-dire le nombre de mots distincts dans le texte.
+
+
+
+vocab = {token: integer for integer, token in enumerate(all_words)}
+ Création du dictionnaire vocab
+enumerate(all_words) : parcourt la liste all_words et associe à chaque élément un index.
+
+Exemple : all_words = ['apple', 'banana', 'cherry']
+
+python
+Copy code
+list(enumerate(all_words))
+# [(0, 'apple'), (1, 'banana'), (2, 'cherry')]
+Dictionnaire par compréhension : {token: integer for integer, token in enumerate(all_words)}
+
+On inverse l’ordre fourni par enumerate pour que la clé soit le mot (token) et la valeur soit l’index (integer).
+
+Exemple :
+
+python
+Copy code
+vocab
+# {'apple': 0, 'banana': 1, 'cherry': 2}
+Résultat : vocab est un dictionnaire qui associe chaque mot unique à un identifiant numérique, très utile pour le NLP ou l’encodage de texte.
+
+python
+Copy code
+for i, item in enumerate(vocab.items()):
+    print(item)
+    if i >= 50:
+        break
+Affichage partiel du dictionnaire
+vocab.items() renvoie les paires (mot, index) du dictionnaire.
+
+enumerate(vocab.items()) ajoute un compteur i pour savoir combien d’éléments ont été parcourus.
+
+print(item) affiche la paire (mot, index).
+
+if i >= 50: break
+
+Arrête la boucle après les 50 premiers mots pour ne pas afficher tout le dictionnaire si le vocabulaire est très grand.
+
+
+
+
+
+
+
+
+
+
+
+------------------DeviserPHrase---------------------------------
+
+
+
+
+
+
+
+
+
+
+
+------------------DeviserPHrase---------------------------------
+
+
+
+
+
+------------------DeviserPHrase---------------------------------
+
+
+
+
+------------------DeviserPHrase---------------------------------
+
+
+
+
+
+
+------------------DeviserPHrase---------------------------------
+
+
+
+
+
+
+
+------------------DeviserPHrase---------------------------------
+
+
+
+------------------DeviserPHrase---------------------------------
+
+
+
+
+
+
+
+
+------------------DeviserPHrase---------------------------------
+
+------------------DeviserPHrase---------------------------------
+
+------------------DeviserPHrase---------------------------------
+
+
+------------------DeviserPHrase---------------------------------
+
+
+------------------DeviserPHrase---------------------------------
+
+------------------DeviserPHrase---------------------------------
+
+------------------DeviserPHrase---------------------------------
+
+
+------------------DeviserPHrase---------------------------------
